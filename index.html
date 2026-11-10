@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camera - IT COMMUNITY</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#0a0a0a;color:#fff;text-align:center;padding:20px}
+h1{color:#1e90ff;margin-bottom:10px}
+video{width:100%;max-width:480px;height:360px;background:#000;border:2px solid #1e90ff;border-radius:15px;object-fit:cover}
+.btns{margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+button{padding:13px 25px;border:none;border-radius:20px;font-weight:bold;cursor:pointer;font-size:15px}
+.on{background:#1e90ff;color:#fff}
+.off{background:#ff4444;color:#fff}
+.switch{background:#333;color:#fff}
+#status{margin-top:15px;color:#00ff88;font-size:14px}
+</style>
+</head>
+<body>
+
+<h1>📷 IT COMMUNITY - Camera</h1>
+<p style="color:#aaa;font-size:13px">Washa camera, zima camera, badilisha mbele / nyuma</p>
+
+<video id="camera" autoplay playsinline muted></video>
+
+<div class="btns">
+  <button class="on" onclick="washaCamera()">📷 Washa Camera</button>
+  <button class="off" onclick="zimaCamera()">⏹️ Zima Camera</button>
+  <button class="switch" onclick="badilishaCamera()">🔄 Mbele / Nyuma</button>
+</div>
+
+<p id="status">Camera imezima</p>
+
+<script>
+let stream = null;
+let video = document.getElementById('camera');
+let statusText = document.getElementById('status');
+let facing = "user"; // user = camera ya mbele, environment = camera ya nyuma
+
+// WASHA CAMERA
+async function washaCamera(){
+  // Kwanza zima kama ilikuwa inawaka
+  zimaCameraSilent();
+
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: facing },
+      audio: false
+    });
+    video.srcObject = stream;
+    statusText.innerText = "✅ Camera INAWAKA - " + (facing === "user" ? "Mbele" : "Nyuma");
+    statusText.style.color = "#00ff88";
+  }catch(e){
+    alert("Ruhusa imekataliwa! Bonyeza Allow / Ruhusu kwenye Chrome juu.");
+    statusText.innerText = "❌ Ruhusa haikutolewa";
+    statusText.style.color = "#ff4444";
+  }
+}
+
+// ZIMA CAMERA
+function zimaCamera(){
+  zimaCameraSilent();
+  video.srcObject = null;
+  statusText.innerText = "⏹️ Camera IMEZIMA";
+  statusText.style.color = "#ff4444";
+}
+
+function zimaCameraSilent(){
+  if(stream){
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
+  }
+}
+
+// BADILISHA MBELE / NYUMA
+function badilishaCamera(){
+  facing = facing === "user" ? "environment" : "user";
+  washaCamera();
+}
+</script>
+
+</body>
+</html>
